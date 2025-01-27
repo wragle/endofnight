@@ -1,0 +1,71 @@
+#!/bin/bash
+
+PURPLE=$(tput setaf 5)
+DEFAULT=$(tput sgr0)
+
+# Checks for flags
+while [[ $# -gt 0 ]]; do
+	case "$1" in
+		-h|--help)
+			help_flag=true
+			;;
+		-g|--global)
+			global_flag=true
+			;;
+		-L|--no-log)
+			nolog_flag=true
+			;;
+		*)
+			echo "Invalid Option: $1"
+			exit 1
+			;;
+	esac
+	shift
+done
+
+# Help text
+if [ $help_flag ]; then
+	echo -e "End of Night - A text-based nightly journal
+Usage: endofnight [OPTION]...
+    -h, --help            displays this screen
+    -g, --global          shuts down all machines
+    -L, --no-log          doesn't create a log entry
+
+Made by Anish Rai"
+	exit
+fi
+
+
+# Gets hour and minutes and removes leading 0
+current_hour=$(date +%H | sed 's/^0//')
+current_minutes=$(date +%M | sed 's/^0//')
+total_minutes=$((current_hour * 60 + current_minutes))
+
+# Creates log entry
+if [ ! $nolog_flag ]; then
+	# Checks if time is before 5:00am
+	if [ $total_minutes -lt 300 ]; then
+		# If time < 5am, sets late flag
+		log endofnight --late
+	else
+		log endofnight
+	fi
+fi
+
+echo "Press Enter to Shutdown"
+read
+
+# Performs global shutdown if flag is set
+if [ $global_flag ]; then
+	echo -e "${PURPLE}Performing global shutdown${DEFAULT}"
+	ssh ctrl@t460 'sudo shutdown 0'
+fi
+
+# Run shutdown script if it exists
+if [ -e $HOME/.config/endofnight/shutdown-script.sh ]; then
+	echo -e "${PURPLE}Running shutdown script${DEFAULT}"
+	$HOME/.config/endofnight/shutdown-script.sh
+fi
+
+echo "${PURPLE}Goodnight.${DEFAULT}"
+sudo poweroff

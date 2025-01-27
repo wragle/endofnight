@@ -1,0 +1,94 @@
+#!/bin/bash
+
+if [ $# -eq 0 ]; then
+	echo "Log type is required"
+	echo "Usage: log TYPE [OPTION]..."
+	exit 1
+fi
+
+log_type="$1"
+shift
+
+if [ ! -e $HOME/.logs/$log_type ]; then
+	echo "$log_type does not exist"
+	exit 1
+fi
+
+while [[ $# -gt 0 ]]; do
+	case "$1" in
+		-h|--help)
+			help_flag=true
+			;;
+		-l|--late)
+			late_flag=true
+			;;
+		-s|--seperate)
+			seperate_flag=true
+			;;
+		*)
+			echo "Invalid Option: $1"
+			exit 1
+			;;
+	esac
+	shift
+done
+
+if [ $help_flag ]; then
+	echo -e "Log - A simple command-line logging tool
+Usage: log TYPE [OPTION]...
+    -h, --help            displays this screen
+    -l, --late            logs for the previous day
+    -s, --seperate        seperates sentences of log files
+
+Made by Anish Rai"
+	exit
+fi
+
+if [ $seperate_flag ]; then
+	cd $HOME/.logs/$log_type
+	if [ ! -e .sentences ]; then
+		echo "Generating sentences directory"
+		mkdir .sentences
+	fi
+	for file in *; do
+		if [ ! -d $file ]; then
+			if [ ! -e ./.sentences/$file.sentences ]; then
+				echo "Seperating entry into sentences [$file]"
+				tail -n +2 $file | tr '\n' ' ' | sed 's/[.!?] /&\n/g' > ./.sentences/$file.sentences
+			fi
+		fi
+	done
+	echo "Seperation complete"
+	exit 0
+fi
+
+if [ $late_flag ]; then
+	date=$(date -d "yesterday" +"%d.%m.%Y")
+else
+	date=$(date +"%d.%m.%Y")
+fi
+
+time=$(date +"%-I:%M%P")
+file="$HOME/.logs/$log_type/$date"
+
+if [ -e "$file" ]; then
+	cat $file
+	echo -e "\nLog already exists for: $date\nDo you wish to edit this log? [y/n]"
+	read edit
+
+	if [[ "$edit" = "y" ]]; then
+		vim "+ normal G $" -Nu $HOME/.config/endofnight/vimrc $file
+	elif [[ "$edit" = "n" ]]; then
+		exit 0
+	else
+		echo "Invalid Option"
+		exit 1
+	fi
+else
+	touch "$file"
+	echo -e "$time, $date\n" > $file
+	vim +startinsert -Nu $HOME/.config/endofnight/vimrc +2 $file
+fi
+
+echo -e "$log_type entry logged for $date"
+
