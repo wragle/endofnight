@@ -92,3 +92,23 @@ fi
 
 echo -e "$log_type entry logged for $date"
 
+# TODO
+# i dont think seperate should be a part of the log program
+# im thinking log should be slimmed down a bit by removing that
+# im also thinking about moving to python to allow some more commands
+# commands:
+# log create [LOG] -> creates a new log and sets config for it e.g. naming convention, title etc.
+# log entry  [LOG] -> creates a log entry
+# log search [LOG] -> searches for word in log
+#
+# [LOG] will be a log name with no spaces
+# also maybe the logs could be stored in a different format?
+# they could allow for a header line of text
+# but they shouldnt really have to store their metadata in plain text at the top of the file
+# making the logs json files would work for this but you would lose the ability
+# to use command line tools on the entries. maybe this is worth it? i can implement the tools
+# i want into this program.
+# or maybe have a way to extract the plaintext messages into files
+# to be honest the current file storage system isnt that good because you cant have multiple
+# entries on the same day, and they dont order that well, and the metadata isnt stored that well
+# ill have a think about all these things... 

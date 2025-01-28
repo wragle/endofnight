@@ -68,4 +68,5 @@ if [ -e $HOME/.config/endofnight/shutdown-script.sh ]; then
 fi
 
 echo "${PURPLE}Goodnight.${DEFAULT}"
+sleep 3
 sudo poweroff
