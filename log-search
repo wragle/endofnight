@@ -1,0 +1,79 @@
+#!/usr/bin/env python3
+
+import argparse
+from datetime import datetime, timedelta
+import re
+import os
+import sys
+
+def calandar_view():
+    files = os.listdir()
+    split_names = []
+    years = []
+    for file in files:
+        split = file.split(".")
+        if len(split) < 3:
+            continue
+        split_names.append(split)
+        if split[2] not in years:
+            years.append(split[2])
+
+    if len(years) == 0:
+        print("Invalid or empty log directory")
+        sys.exit(1)
+    years.sort()
+
+    try:
+        start_date = datetime(int(years[0]), 1, 1)
+    except:
+        print("Invalid or empty log directory")
+        sys.exit(1)
+    end_date = datetime.now()
+
+    output = start_date.strftime("[%Y]\n%B\n")
+    output += "  " * start_date.weekday()
+    count = start_date.weekday() + 1
+    new_year = False
+    current_date = start_date
+    last_date = current_date
+    while current_date <= end_date:
+        if current_date.year  != last_date.year:
+            if (count - 1) % 7 != 0:
+                output += "\n"
+            output += current_date.strftime("\n[%Y]\n")
+            new_year = True
+        if current_date.month != last_date.month:
+            if (count - 1) % 7 != 0 and not new_year:
+                output += "\n"
+            if not new_year:
+                output += "\n"
+            new_year = False
+            output += current_date.strftime("%B\n")
+            output += "  " * ((count - 1) % 7)
+        last_date = current_date
+
+        formatted_date = current_date.strftime("%d.%m.%Y")
+        if formatted_date in files:
+            output += "x"
+        else:
+            output += " "
+        output += " "
+        if count % 7 == 0:
+            output += "\n"
+        count += 1
+
+        current_date += timedelta(days=1)
+
+    print(output)
+    sys.exit(0)
+
+def main():
+    calandar_view()
+
+if __name__ == "__main__":
+    main()
+
+# change this (probably rewrite) 
+# take log_type as first arg then a regexp as 2nd arg
+# possibly display - for log entry but no search hit
+# and x for log and search hit
