@@ -38,6 +38,7 @@ def calandar_view(regex):
     new_year = False
     current_date = start_date
     last_date = current_date
+    total = 0
     while current_date <= end_date:
         if current_date.year  != last_date.year:
             if (count - 1) % 7 != 0:
@@ -58,8 +59,10 @@ def calandar_view(regex):
         if formatted_date in files:
             with open(formatted_date, 'r') as file:
                 contents = file.read()
-            if len(re.findall(regex, contents)):
-                output += f"{BOLD}{RED}x{DEFAULT}"
+            occurances = re.findall(regex, contents)
+            if len(occurances):
+                output += f"{BOLD}{COLOUR}x{DEFAULT}"
+                total += len(occurances)
             else:
                 output += "x"
         else:
@@ -68,10 +71,9 @@ def calandar_view(regex):
         if count % 7 == 0:
             output += "\n"
         count += 1
-
         current_date += timedelta(days=1)
-
     print(output)
+    print(f'{BOLD}{COLOUR}{total}{DEFAULT} mention'+('s' if total == 0 or total > 1 else ''))
     sys.exit(0)
 
 def path_to_formatted_date(file_path):
@@ -81,7 +83,6 @@ def path_to_formatted_date(file_path):
         else:
             suffix = {1: 'st', 2: 'nd', 3: 'rd'}.get(n % 10, 'th')
         return str(n) + suffix
-
     date_str = file_path.stem
     date = datetime.strptime(date_str, '%d.%m.%Y')
     day = ordinal(date.day)
@@ -97,11 +98,15 @@ def lines_view(regex, reverse:bool):
     sorted_files = sorted(files, key=get_date)
     if reverse:
         sorted_files.reverse()
+    total = 0
     for file_path in sorted_files:
-        result = subprocess.run(['egrep', '--color=auto', regex, str(file_path)], stdout=subprocess.PIPE, text=True)
+        result = subprocess.run(['egrep', '-o', '--color=auto', regex, str(file_path)], stdout=subprocess.PIPE, text=True)
+        total += len(result.stdout.splitlines()) 
         if result.returncode == 0:
             print(f"\n{path_to_formatted_date(file_path)}")
             subprocess.run(['egrep', '--color=always', regex, str(file_path)])
+    print(f'\n{BOLD}{COLOUR}{total}{DEFAULT} mention'+('s' if total == 0 or total > 1 else ''))
+
 
 def main():
     parser = argparse.ArgumentParser(description="Search for RegExps in your Logs")
@@ -124,14 +129,13 @@ def main():
             lines_view(args.regex, False)
     sys.exit(0)
 
-RED = "\033[31m"
+COLOUR = "\033[35m"
 BOLD = "\033[1m"
 DEFAULT = "\033[0m"
 
 if __name__ == "__main__":
     main()
 
-# change this (probably rewrite) 
-# take log_type as first arg then a regex as 2nd arg
-# possibly display - for log entry but no search hit
-# and x for log and search hit
+# show count instead of x for occurances, maybe let using flag
+# show total count at the bottom
+# change usage to: log-search LOG -x regex
