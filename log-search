@@ -74,18 +74,40 @@ def calandar_view(regex):
     print(output)
     sys.exit(0)
 
-def run_egrep_multiple(regex):
+def path_to_formatted_date(file_path):
+    def ordinal(n):
+        if 10 <= n % 100 <= 20:
+            suffix = 'th'
+        else:
+            suffix = {1: 'st', 2: 'nd', 3: 'rd'}.get(n % 10, 'th')
+        return str(n) + suffix
+
+    date_str = file_path.stem
+    date = datetime.strptime(date_str, '%d.%m.%Y')
+    day = ordinal(date.day)
+    return date.strftime(f'{day} %B, %Y')
+    
+
+def lines_view(regex, reverse:bool):
     sentences_dir = Path.cwd() / '.sentences'
-    for file_path in sentences_dir.glob('*.sentences'):
-        print(f"\nSearching in {file_path.name}:")
-        result = subprocess.run(['egrep', '--color=auto', regex, str(file_path)], capture_output=True, text=True)
-        if result.stdout:
-            print(result.stdout.rstrip())
+    files = [file_path for file_path in sentences_dir.glob('*.sentences')]
+    def get_date(file_path):
+        date_str = file_path.stem
+        return datetime.strptime(date_str, '%d.%m.%Y')
+    sorted_files = sorted(files, key=get_date)
+    if reverse:
+        sorted_files.reverse()
+    for file_path in sorted_files:
+        result = subprocess.run(['egrep', '--color=auto', regex, str(file_path)], stdout=subprocess.PIPE, text=True)
+        if result.returncode == 0:
+            print(f"\n{path_to_formatted_date(file_path)}")
+            subprocess.run(['egrep', '--color=always', regex, str(file_path)])
 
 def main():
     parser = argparse.ArgumentParser(description="Search for RegExps in your Logs")
     parser.add_argument('-c', '--calandar', action='store_true', help='calandar view')
     parser.add_argument('-l', '--lines', action='store_true', help='lines view')
+    parser.add_argument('-r', '--reverse', action='store_true', help='reverse ordering for lines view') 
     parser.add_argument('regex', help='the regex to be searched for')
     args = parser.parse_args()
     try:
@@ -96,8 +118,10 @@ def main():
     if args.calandar:
         calandar_view(regex)
     if args.lines:
-        pass
-        #run_egrep_multiple(args.regex)
+        if args.reverse:
+            lines_view(args.regex, True)
+        else:
+            lines_view(args.regex, False)
     sys.exit(0)
 
 RED = "\033[31m"
