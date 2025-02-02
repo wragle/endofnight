@@ -8,7 +8,8 @@ import sys
 import subprocess
 from pathlib import Path
 
-def calandar_view(regex):
+def calandar_view(regex, **kwargs):
+    occurrence_flag = kwargs.get('occurrences', False)
     files = os.listdir()
     split_names = []
     years = []
@@ -59,10 +60,10 @@ def calandar_view(regex):
         if formatted_date in files:
             with open(formatted_date, 'r') as file:
                 contents = file.read()
-            occurances = re.findall(regex, contents)
-            if len(occurances):
-                output += f"{BOLD}{COLOUR}x{DEFAULT}"
-                total += len(occurances)
+            occurrences = re.findall(regex, contents)
+            if len(occurrences):
+                output += f"{BOLD}{COLOUR}{len(occurrences) if occurrence_flag else 'x'}{DEFAULT}"
+                total += len(occurrences)
             else:
                 output += "x"
         else:
@@ -89,14 +90,15 @@ def path_to_formatted_date(file_path):
     return date.strftime(f'{day} %B, %Y')
     
 
-def lines_view(regex, reverse:bool):
+def lines_view(regex, **kwargs):
+    reverse_flag = kwargs.get('reverse', False)
     sentences_dir = Path.cwd() / '.sentences'
     files = [file_path for file_path in sentences_dir.glob('*.sentences')]
     def get_date(file_path):
         date_str = file_path.stem
         return datetime.strptime(date_str, '%d.%m.%Y')
     sorted_files = sorted(files, key=get_date)
-    if reverse:
+    if reverse_flag:
         sorted_files.reverse()
     total = 0
     for file_path in sorted_files:
@@ -113,6 +115,7 @@ def main():
     parser.add_argument('-c', '--calandar', action='store_true', help='calandar view')
     parser.add_argument('-l', '--lines', action='store_true', help='lines view')
     parser.add_argument('-r', '--reverse', action='store_true', help='reverse ordering for lines view') 
+    parser.add_argument('-o', '--occurrences', action='store_true', help='show number of occurrences in calandar view')
     parser.add_argument('regex', help='the regex to be searched for')
     args = parser.parse_args()
     try:
@@ -121,12 +124,9 @@ def main():
         print(f'Invalid regex pattern: {e}')
         sys.exit(1)
     if args.calandar:
-        calandar_view(regex)
+        calandar_view(regex, occurrences=args.occurrences)
     if args.lines:
-        if args.reverse:
-            lines_view(args.regex, True)
-        else:
-            lines_view(args.regex, False)
+        lines_view(args.regex, reverse=args.reverse)
     sys.exit(0)
 
 COLOUR = "\033[35m"
@@ -136,6 +136,6 @@ DEFAULT = "\033[0m"
 if __name__ == "__main__":
     main()
 
-# show count instead of x for occurances, maybe let using flag
+# show count instead of x for occurrences, maybe let using flag
 # show total count at the bottom
 # change usage to: log-search LOG -x regex

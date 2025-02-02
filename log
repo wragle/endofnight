@@ -1,19 +1,5 @@
 #!/bin/bash
 
-if [ $# -eq 0 ]; then
-	echo "Log type is required"
-	echo "Usage: log TYPE [OPTION]..."
-	exit 1
-fi
-
-log_type="$1"
-shift
-
-if [ ! -e $HOME/.logs/$log_type ]; then
-	echo "$log_type does not exist"
-	exit 1
-fi
-
 while [[ $# -gt 0 ]]; do
 	case "$1" in
 		-h|--help)
@@ -25,9 +11,12 @@ while [[ $# -gt 0 ]]; do
 		-s|--seperate)
 			seperate_flag=true
 			;;
-		*)
+		-*)
 			echo "Invalid Option: $1"
 			exit 1
+			;;
+		*)
+			log_type="$1"
 			;;
 	esac
 	shift
@@ -42,6 +31,17 @@ Usage: log TYPE [OPTION]...
 
 Made by Anish Rai"
 	exit
+fi
+
+if [ -z "$log_type" ]; then
+	echo "Log type is required"
+	echo "Usage: log TYPE [OPTION]..."
+	exit 1
+fi
+
+if [ ! -e $HOME/.logs/$log_type ]; then
+	echo "$log_type does not exist"
+	exit 1
 fi
 
 if [ $seperate_flag ]; then
