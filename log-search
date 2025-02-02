@@ -5,8 +5,10 @@ from datetime import datetime, timedelta
 import re
 import os
 import sys
+import subprocess
+from pathlib import Path
 
-def calandar_view():
+def calandar_view(regex):
     files = os.listdir()
     split_names = []
     years = []
@@ -54,7 +56,12 @@ def calandar_view():
 
         formatted_date = current_date.strftime("%d.%m.%Y")
         if formatted_date in files:
-            output += "x"
+            with open(formatted_date, 'r') as file:
+                contents = file.read()
+            if len(re.findall(regex, contents)):
+                output += f"{BOLD}{RED}x{DEFAULT}"
+            else:
+                output += "x"
         else:
             output += " "
         output += " "
@@ -67,13 +74,40 @@ def calandar_view():
     print(output)
     sys.exit(0)
 
+def run_egrep_multiple(regex):
+    sentences_dir = Path.cwd() / '.sentences'
+    for file_path in sentences_dir.glob('*.sentences'):
+        print(f"\nSearching in {file_path.name}:")
+        result = subprocess.run(['egrep', '--color=auto', regex, str(file_path)], capture_output=True, text=True)
+        if result.stdout:
+            print(result.stdout.rstrip())
+
 def main():
-    calandar_view()
+    parser = argparse.ArgumentParser(description="Search for RegExps in your Logs")
+    parser.add_argument('-c', '--calandar', action='store_true', help='calandar view')
+    parser.add_argument('-l', '--lines', action='store_true', help='lines view')
+    parser.add_argument('regex', help='the regex to be searched for')
+    args = parser.parse_args()
+    try:
+        regex = re.compile(args.regex)
+    except re.error as e:
+        print(f'Invalid regex pattern: {e}')
+        sys.exit(1)
+    if args.calandar:
+        calandar_view(regex)
+    if args.lines:
+        pass
+        #run_egrep_multiple(args.regex)
+    sys.exit(0)
+
+RED = "\033[31m"
+BOLD = "\033[1m"
+DEFAULT = "\033[0m"
 
 if __name__ == "__main__":
     main()
 
 # change this (probably rewrite) 
-# take log_type as first arg then a regexp as 2nd arg
+# take log_type as first arg then a regex as 2nd arg
 # possibly display - for log entry but no search hit
 # and x for log and search hit
