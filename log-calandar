@@ -2,11 +2,14 @@
 
 import argparse
 from datetime import datetime, timedelta
+import argparse
+from pathlib import Path
+import argcomplete
 import os
 import sys
 
-def calandar_view():
-    files = os.listdir()
+def calandar_view(logs_dir_path):
+    files = [file.name for file in logs_dir_path.iterdir() if file.is_file()]
     split_names = []
     years = []
     for file in files:
@@ -32,6 +35,7 @@ def calandar_view():
     output = start_date.strftime("[%Y]\n%B\n")
     output += "  " * start_date.weekday()
     count = start_date.weekday() + 1
+    total = 0
     new_year = False
     current_date = start_date
     last_date = current_date
@@ -54,6 +58,7 @@ def calandar_view():
         formatted_date = current_date.strftime("%d.%m.%Y")
         if formatted_date in files:
             output += "x"
+            total += 1
         else:
             output += " "
         output += " "
@@ -64,10 +69,24 @@ def calandar_view():
         current_date += timedelta(days=1)
 
     print(output)
-    sys.exit(0)
+    return total
+
+def get_logs():
+    logs = [d.name for d in LOGS_DIR.iterdir() if d.is_dir() and d.name[0] != '.']
+    return logs
 
 def main():
-    calandar_view()
+    parser = argparse.ArgumentParser()
+    logs = get_logs()
+    parser.add_argument('log', choices=logs, help='the log to be displayed')
+    argcomplete.autocomplete(parser)
+    args = parser.parse_args()
+    log_dir_path = LOGS_DIR / args.log 
+    total = calandar_view(log_dir_path)
+    print(f'{total} total entries in {args.log}')
+    sys.exit(0)
+
+LOGS_DIR = Path.home() / '.logs'
 
 if __name__ == "__main__":
     main()
