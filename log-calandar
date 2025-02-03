@@ -79,7 +79,7 @@ def main():
     parser = argparse.ArgumentParser()
     logs = get_logs()
     parser.add_argument('log', choices=logs, help='the log to be displayed')
-    argcomplete.autocomplete(parser)
+    argcomplete.autocomplete(parser, always_complete_options=False)
     args = parser.parse_args()
     log_dir_path = LOGS_DIR / args.log 
     total = calandar_view(log_dir_path)

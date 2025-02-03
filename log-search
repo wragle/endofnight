@@ -127,7 +127,7 @@ def main():
     parser.add_argument('-o', '--occurrences', action='store_true', help='show number of occurrences in calandar view')
     parser.add_argument('log', choices=logs, help='the log to be searched')
     parser.add_argument('regex', help='the regex to be searched for')
-    argcomplete.autocomplete(parser)
+    argcomplete.autocomplete(parser, always_complete_options=False)
     args = parser.parse_args()
     try:
         regex = re.compile(args.regex)
