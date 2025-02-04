@@ -68,7 +68,7 @@ def calandar_view(logs_dir_path):
 
         current_date += timedelta(days=1)
 
-    print(output)
+    print(output + '\n')
     return total
 
 def get_logs():
