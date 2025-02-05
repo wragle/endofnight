@@ -10,7 +10,7 @@ from pathlib import Path
 
 def calandar_view(log_dir_path, regex, **kwargs):
     occurrence_flag = kwargs.get('occurrences', False)
-    files = [file.name for file in log_dir_path.iterdir() if file.is_file()] 
+    files = [file.name for file in log_dir_path.iterdir() if file.is_file() and file.name[0] != '.'] 
     split_names = []
     years = []
     for file in files:
@@ -104,7 +104,7 @@ def lines_view(log_dir_path, regex, **kwargs):
     print()
 
 def count_mentions(log_dir_path, regex):
-    files = [file.name for file in log_dir_path.iterdir() if file.is_file()]
+    files = [file.name for file in log_dir_path.iterdir() if file.is_file() and file.name[0] != '.']
     total = 0
     for file_name in files:
         with open(log_dir_path / file_name, 'r') as file:
