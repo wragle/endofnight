@@ -62,10 +62,10 @@ if [ $global_flag ]; then
 fi
 
 # Run shutdown script if it exists
-if [ -e $HOME/.config/endofnight/shutdown-script.sh ]; then
-	echo -e "${PURPLE}Running shutdown script${DEFAULT}"
-	$HOME/.config/endofnight/shutdown-script.sh
-fi
+#if [ -e $HOME/.config/endofnight/shutdown-script.sh ]; then
+#	echo -e "${PURPLE}Running shutdown script${DEFAULT}"
+#	$HOME/.config/endofnight/shutdown-script.sh
+#fi
 
 echo "${PURPLE}Goodnight.${DEFAULT}"
 sleep 3
