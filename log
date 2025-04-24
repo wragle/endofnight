@@ -11,6 +11,9 @@ while [[ $# -gt 0 ]]; do
 		-s|--seperate)
 			seperate_flag=true
 			;;
+		-v|--verbose)
+			verbose_flag=true
+			;;
 		-*)
 			echo "Invalid Option: $1"
 			exit 1
@@ -39,26 +42,27 @@ if [ -z "$log_type" ]; then
 	exit 1
 fi
 
-if [ ! -e $HOME/.logs/$log_type ]; then
+if [ ! -e $XDG_DATA_HOME/log/$log_type ]; then
 	echo "$log_type does not exist"
 	exit 1
 fi
 
 if [ $seperate_flag ]; then
-	cd $HOME/.logs/$log_type
+	cd $XDG_DATA_HOME/log/$log_type
 	if [ ! -e .sentences ]; then
-		echo "Generating sentences directory"
+		if [ $verbose_flag ]; then echo "Generating sentences directory"; fi
 		mkdir .sentences
 	fi
 	for file in *; do
 		if [ ! -d $file ]; then
 			if [ ! -e ./.sentences/$file.sentences ]; then
-				echo "Seperating entry into sentences [$file]"
+				if [ $verbose_flag ]; then echo "Seperating entry into sentences [$file]"; fi
+					
 				tail -n +2 $file | tr '\n' ' ' | sed 's/[.!?] /&\n/g' > ./.sentences/$file.sentences
 			fi
 		fi
 	done
-	echo "Seperation complete"
+	if [ $verbose_flag ]; then echo "Seperation complete"; fi
 	exit 0
 fi
 
@@ -69,7 +73,7 @@ else
 fi
 
 time=$(date +"%-I:%M%P")
-file="$HOME/.logs/$log_type/$date"
+file="$XDG_DATA_HOME/log/$log_type/$date"
 
 if [ -e "$file" ]; then
 	cat $file

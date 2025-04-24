@@ -19,6 +19,7 @@ def calandar_view(logs_dir_path):
         split_names.append(split)
         if split[2] not in years:
             years.append(split[2])
+    years.sort()
 
     if len(years) == 0:
         print("Invalid or empty log directory")
@@ -86,7 +87,7 @@ def main():
     print(f'{total} total entries in {args.log}')
     sys.exit(0)
 
-LOGS_DIR = Path.home() / '.logs'
+LOGS_DIR = Path.home() / '.local/share/log'
 
 if __name__ == "__main__":
     main()

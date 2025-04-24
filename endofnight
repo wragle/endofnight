@@ -1,6 +1,8 @@
 #!/bin/bash
 
-PURPLE=$(tput setaf 5)
+# colours
+BOLD=$(tput bold)
+MAGENTA=$(tput setaf 5)
 DEFAULT=$(tput sgr0)
 
 # Checks for flags
@@ -57,16 +59,16 @@ read
 
 # Performs global shutdown if flag is set
 if [ $global_flag ]; then
-	echo -e "${PURPLE}Performing global shutdown${DEFAULT}"
+	echo -e "${BOLD}${MAGENTA}Performing global shutdown${DEFAULT}"
 	ssh ctrl@t460 'sudo shutdown 0'
 fi
 
 # Run shutdown script if it exists
 #if [ -e $HOME/.config/endofnight/shutdown-script.sh ]; then
-#	echo -e "${PURPLE}Running shutdown script${DEFAULT}"
+#	echo -e "${BOLD}${MAGENTA}Running shutdown script${DEFAULT}"
 #	$HOME/.config/endofnight/shutdown-script.sh
 #fi
 
-echo "${PURPLE}Goodnight.${DEFAULT}"
+echo "${BOLD}${MAGENTA}Goodnight.${DEFAULT}"
 sleep 3
 sudo poweroff
