@@ -1,10 +1,10 @@
 #!/bin/sh
 
-if [ ! -d "$HOME/.logs" ]; then
-	echo "Creating ~/.logs/ directory"
-	mkdir $HOME/.logs
+if [ ! -d "$HOME/.local/share/log" ]; then
+	echo "Creating ~/.local/share/log directory"
+	mkdir $HOME/.local/share/log
 	echo "Creating ~/.logs/endofnight directory"
-	mkdir $HOME/.logs/endofnight
+	mkdir $HOME/.local/share/log/endofnight
 fi
 
 ln .vimrc $HOME/.config/endofnight/vimrc 2> /dev/null && echo "Created link for vimrc" || echo "Skipping vimrc, link already exists"
