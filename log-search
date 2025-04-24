@@ -146,7 +146,7 @@ def main():
 COLOUR = "\033[35m"
 BOLD = "\033[1m"
 DEFAULT = "\033[0m"
-LOGS_DIR = Path.home() / '.logs'
+LOGS_DIR = Path.home() / '.local/share/log'
 
 if __name__ == "__main__":
     main()
