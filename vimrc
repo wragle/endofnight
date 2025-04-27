@@ -1,5 +1,18 @@
 syntax on
 
+" environment
+set directory=$XDG_CACHE_HOME/vim,~/,/tmp
+set backupdir=$XDG_CACHE_HOME/vim,~/,/tmp
+set viminfo+=n$XDG_CACHE_HOME/vim/viminfo
+set runtimepath=$XDG_CONFIG_HOME/vim,$XDG_CONFIG_HOME/vim/aft   er,$VIM,$VIMRUNTIME
+let $MYVIMRC="$XDG_CONFIG_HOME/vim/vimrc"
+
+set nocompatible
+
+" ctrl+c to enter normal mode
+inoremap <C-c> <Esc>
+inoremap <Esc> <Nop>
+
 set textwidth=85
 set wrap
 set linebreak
